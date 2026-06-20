@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Généalogies royales européennes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <header id="topbar">
+    <h1>Généalogies royales européennes</h1>
+    <div class="topbar-actions">
+      <button id="kinship-toggle" class="topbar-btn">Lien de parenté</button>
+      <button id="chart-toggle" class="topbar-btn">Évolution de la consanguinité</button>
+      <button id="map-toggle" class="topbar-btn">Carte</button>
+      <div id="search-wrapper" class="search-wrapper">
+        <input id="search" type="text" class="search-input" placeholder="Rechercher une personne…" autocomplete="off" />
+        <ul id="search-results" class="search-dropdown"></ul>
+      </div>
+      </div>
+      </header>
+
+      <aside id="filters">
+        <h2>Maisons</h2>
+        <div id="house-list"></div>
+      </aside>
+
+      <main id="graph-container">
+        <canvas id="graph"></canvas>
+        <div id="kinship-panel">
+          <button id="kinship-close" aria-label="Fermer">&times;</button>
+          <h2>Lien de parenté entre deux personnes</h2>
+          <div class="kinship-inputs">
+            <div class="search-wrapper kinship-search">
+              <input id="kinship-a" type="text" class="search-input" placeholder="Première personne…" autocomplete="off" />
+              <ul id="kinship-a-results" class="search-dropdown"></ul>
+            </div>
+            <span class="kinship-and">et</span>
+            <div class="search-wrapper kinship-search">
+              <input id="kinship-b" type="text" class="search-input" placeholder="Deuxième personne…" autocomplete="off" />
+              <ul id="kinship-b-results" class="search-dropdown"></ul>
+            </div>
+          </div>
+          <div id="kinship-result"></div>
+        </div>
+        <div id="legend">
+        <h3>Légende</h3>
+        <div class="legend-item"><span class="swatch swatch--filiation"></span>Filiation (parent → enfant)</div>
+        <div class="legend-item"><span class="swatch swatch--union"></span>Union, même maison</div>
+        <div class="legend-item"><span class="swatch swatch--alliance"></span>Alliance entre deux maisons</div>
+        <div class="legend-item"><span class="swatch swatch--consanguine"></span>Union consanguine notable</div>
+        <div class="legend-item"><span class="dot-sample"></span>Individu issu d'une union consanguine</div>
+    </div>
+      </main>
+
+      <aside id="detail-panel" class="hidden">
+        <button id="close-panel" aria-label="Fermer">&times;</button>
+        <div id="detail-content"></div>
+      </aside>
+    </div>
+    <div id="chart-overlay">
+      <div id="chart-panel">
+        <button id="chart-close" aria-label="Fermer">&times;</button>
+        <h2>Évolution du coefficient de consanguinité par dynastie</h2>
+        <p class="chart-subtitle">Chaque point représente une personne née avec un degré de consanguinité connu. Les lignes montrent la moyenne par tranche de 50 ans pour chaque maison — clique sur la légende pour isoler une maison, sur un point pour la localiser dans le graphe.</p>
+        <div id="chart-container"></div>
+        <div id="chart-legend"></div>
+      </div>
+    </div>
+    <div id="map-overlay">
+      <div id="map-panel">
+        <button id="map-close" aria-label="Fermer">&times;</button>
+        <h2>Lieux de naissance par dynastie</h2>
+        <p class="chart-subtitle">Chaque point représente le lieu de naissance d'une personne. Déplace le curseur pour te situer dans le temps, ou choisis « Toute la période » — clique sur la légende pour isoler une maison, sur un point pour la localiser dans le graphe.</p>
+        <div id="map-container"></div>
+        <div id="map-slider-bar"></div>
+        <div id="map-legend"></div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

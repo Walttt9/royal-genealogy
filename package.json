@@ -1,0 +1,20 @@
+{
+  "name": "royal-genealogy",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "fetch-data": "node scripts/fetch-data.js",
+    "preview": "vite preview",
+    "compute-inbreeding": "node scripts/compute-inbreeding.js"
+  },
+  "devDependencies": {
+    "vite": "^8.0.12"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "topojson-client": "^3.1.0"
+  }
+}
