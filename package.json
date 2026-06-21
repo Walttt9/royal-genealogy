@@ -8,7 +8,9 @@
     "build": "vite build",
     "fetch-data": "node scripts/fetch-data.js",
     "preview": "vite preview",
-    "compute-inbreeding": "node scripts/compute-inbreeding.js"
+    "compute-inbreeding": "node scripts/compute-inbreeding.js",
+    "precompute-layout": "node scripts/precompute-layout.js",
+    "build-data": "npm run fetch-data && npm run compute-inbreeding && npm run precompute-layout"
   },
   "devDependencies": {
     "vite": "^8.0.12"

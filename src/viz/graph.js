@@ -3,13 +3,28 @@ import * as d3 from 'd3';
 const CONSANGUINITY_THRESHOLD = 0.0625;
 const LABEL_ZOOM_THRESHOLD = 2.2;
 const OVERVIEW_ZOOM_THRESHOLD = 1.8;
-const MAX_OVERVIEW_NODES = 280;   // nb de personnages affichés en vue d'ensemble (les plus connectés)
-const MAX_DETAIL_NODES = 700;     // nb max affiché une fois zoomé sur une zone
-const MAX_VISIBLE_LABELS = 110;
+const MAX_OVERVIEW_NODES = 280;
+const MAX_DETAIL_NODES = 700;
 
 export function createGraph({ svgEl: canvasEl, data, onSelect }) {
-  const { people, couples } = data;
+  const { people, couples, layoutMeta } = data;
   const byId = new Map(people.map(p => [p.id, p]));
+
+  // Cadre de référence dans lequel les positions x/y ont été précalculées
+  // (voir scripts/precompute-layout.js). On adapte ensuite ce cadre fixe à
+  // la taille réelle de l'écran via une transformation de zoom initiale,
+  // plutôt que de recalculer quoi que ce soit.
+  const refWidth = layoutMeta?.refWidth ?? 1600;
+  const refHeight = layoutMeta?.refHeight ?? 900;
+  const xDomain = layoutMeta?.xDomain ?? [1000, 2000];
+
+  // Filet de sécurité : si une position venait à manquer (donnée corrompue),
+  // on la place au centre plutôt que de planter le rendu.
+  for (const p of people) {
+    if (!Number.isFinite(p.x)) p.x = refWidth / 2;
+    if (!Number.isFinite(p.y)) p.y = refHeight / 2;
+    p._hidden = false;
+  }
 
   const cs = getComputedStyle(document.documentElement);
   const COLORS = {
@@ -21,45 +36,6 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     bgElevated: cs.getPropertyValue('--bg-elevated').trim(),
     ivoryDim: cs.getPropertyValue('--ivory-dim').trim(),
   };
-
-  // --- Estimation de l'année de naissance ---
-  const yearCache = new Map();
-  function yearOf(id, visited = new Set()) {
-    if (yearCache.has(id)) return yearCache.get(id);
-    if (visited.has(id)) return null;
-    visited.add(id);
-    const p = byId.get(id);
-    if (!p) return null;
-    if (p.birth) {
-      const y = parseInt(p.birth.slice(0, 4), 10);
-      yearCache.set(id, y);
-      return y;
-    }
-    const fatherYear = p.father ? yearOf(p.father.id, visited) : null;
-    const motherYear = p.mother ? yearOf(p.mother.id, visited) : null;
-    const y = fatherYear != null ? fatherYear + 28 : (motherYear != null ? motherYear + 26 : null);
-    yearCache.set(id, y);
-    return y;
-  }
-
-  const knownYears = people.map(p => yearOf(p.id)).filter(y => y != null);
-  const fallbackYear = d3.median(knownYears) ?? 1600;
-
-  function jitterFromId(id, seed, range) {
-    let hash = 0;
-    const key = id + seed;
-    for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) | 0;
-    return (Math.abs(hash) % (range * 2 + 1)) - range;
-  }
-
-  const [domainMin, domainMax] = [d3.min(knownYears) ?? 1500, d3.max(knownYears) ?? 1900];
-  const spread = (domainMax - domainMin) / 2;
-
-  for (const p of people) {
-    const known = yearOf(p.id);
-    p._year = known ?? (fallbackYear + jitterFromId(p.id, 'year', spread));
-    p._hidden = false;
-  }
 
   // --- Liens ---
   const parentLinks = [];
@@ -82,16 +58,18 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
   }
   const peopleByDegree = [...people].sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0));
 
+  // --- Résolution des liens vers de vraies références d'objets (id -> personne) ---
+  for (const l of allLinks) {
+    if (typeof l.source !== 'object') l.source = byId.get(l.source);
+    if (typeof l.target !== 'object') l.target = byId.get(l.target);
+  }
+
   // --- Palette par maison ---
   const houseNames = Array.from(new Set(people.flatMap(p => p.houses)))
     .sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
-
-  // Palette à 10 teintes réparties uniformément sur le cercle chromatique
-  // (~36° d'écart entre chaque couleur), pour que deux maisons ne soient
-  // jamais visuellement confondables, même en petit format.
   const houseColor = d3.scaleOrdinal()
     .domain(houseNames)
-    .range(['#c9a35a', '#c9c15f', '#8fb35f', '#4fc9a0', '#5f93c9', '#6f7ec9', '#8a6ac9', '#b35fae', '#c9648f', '#c97a5a'])
+    .range(['#c9a35a', '#c9c15f', '#8fb35f', '#4fc9a0', '#5f93c9', '#6f7ec9', '#8a6ac9', '#b35fae', '#c9648f', '#c97a5a', '#7ec9c2', '#c9a05f'])
     .unknown('#5a5650');
 
   // --- Préparation du canvas ---
@@ -104,47 +82,22 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
   ctx.scale(dpr, dpr);
   ctx.font = '9px Inter, sans-serif';
 
-  const xScale = d3.scaleLinear()
-    .domain([d3.min(people, d => d._year) - 10, d3.max(people, d => d._year) + 10])
-    .range([60, width - 60]);
+  const xScale = d3.scaleLinear().domain(xDomain).range([60, refWidth - 60]);
 
-  for (const p of people) {
-    p.x = xScale(p._year);
-    p.y = height / 2 + jitterFromId(p.id, 'y', height / 3);
-  }
+  const root = canvasEl.parentElement; // pour un éventuel usage futur (non utilisé pour l'instant)
 
-  // --- Overlay de chargement ---
-  const container = canvasEl.parentElement;
-  const loadingEl = document.createElement('div');
-  loadingEl.className = 'graph-loading';
-  loadingEl.textContent = 'Calcul de la disposition… 0%';
-  container.appendChild(loadingEl);
-
-  // --- Simulation physique ---
-  const simulation = d3.forceSimulation(people)
-    .force('link', d3.forceLink(allLinks).id(d => d.id).distance(l => l.type === 'spouse' ? 24 : 50).strength(0.2))
-    .force('charge', d3.forceManyBody().strength(-30).distanceMax(400))
-    .force('x', d3.forceX(d => xScale(d._year)).strength(0.85))
-    .force('y', d3.forceY(height / 2).strength(0.04))
-    .force('collide', d3.forceCollide(9))
-    .velocityDecay(0.5);
+  const quadtree = d3.quadtree(people, d => d.x, d => d.y);
+  const textWidth = new Map();
+  for (const p of people) textWidth.set(p.id, ctx.measureText(p.name).width);
 
   function isAlliance(d) {
     return !d.source.houses.some(h => d.target.houses.includes(h));
   }
-
   const filiationLinks = allLinks.filter(d => d.type === 'parent');
   const spouseResolved = allLinks.filter(d => d.type === 'spouse');
   const consanguineLinks = spouseResolved.filter(d => d.kinship >= CONSANGUINITY_THRESHOLD);
   const allianceLinks = spouseResolved.filter(d => d.kinship < CONSANGUINITY_THRESHOLD && isAlliance(d));
   const unionLinks = spouseResolved.filter(d => d.kinship < CONSANGUINITY_THRESHOLD && !isAlliance(d));
-
-  function sanitizePositions() {
-    for (const p of people) {
-      if (!Number.isFinite(p.x)) p.x = xScale(p._year);
-      if (!Number.isFinite(p.y)) p.y = height / 2;
-    }
-  }
 
   // --- État d'interaction ---
   let transform = d3.zoomIdentity;
@@ -156,23 +109,6 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
   let labelVisibleSet = new Set();
   let visTimer = null;
   let rafScheduled = false;
-  let quadtree = null;
-  const textWidth = new Map();
-  function measureAllLabels() {
-    ctx.font = '9px Inter, sans-serif';
-    for (const p of people) textWidth.set(p.id, ctx.measureText(p.name).width);
-  }
-  measureAllLabels();
-
-  // "Inter" charge de façon asynchrone (Google Fonts) ; si elle n'était pas encore
-  // disponible lors de la mesure ci-dessus, le navigateur a utilisé une police de
-  // secours aux dimensions différentes, faussant durablement le calcul anti-
-  // chevauchement des labels. On remesure donc dès que la police annoncée est
-  // réellement prête, et on recalcule l'affichage en conséquence.
-  document.fonts.ready.then(() => {
-    measureAllLabels();
-    updateVisibility();
-  });
 
   function scheduleDraw() {
     if (rafScheduled) return;
@@ -180,7 +116,6 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     requestAnimationFrame(() => { rafScheduled = false; draw(); });
   }
 
-  // --- Calcul du niveau de détail (quels nœuds/labels afficher) ---
   function updateVisibility() {
     let candidates;
     if (transform.k < OVERVIEW_ZOOM_THRESHOLD) {
@@ -194,8 +129,6 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
         .slice(0, MAX_DETAIL_NODES);
     }
 
-    // Une sélection ou un chemin de parenté actif reste toujours visible,
-    // même hors du périmètre normal du niveau de détail.
     if (highlightActive && neighborSet) {
       const known = new Set(candidates.map(p => p.id));
       for (const p of peopleByDegree) {
@@ -228,7 +161,7 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
   }
 
   const zoom = d3.zoom()
-    .scaleExtent([0.15, 14])
+    .scaleExtent([0.1, 14])
     .on('zoom', (e) => {
       transform = e.transform;
       clearTimeout(visTimer);
@@ -243,7 +176,6 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
   }
 
   function visibleNodeAt(gx, gy) {
-    if (!quadtree) return null;
     const found = quadtree.find(gx, gy, 16 / transform.k);
     if (!found || found._hidden || !nodeVisibleSet.has(found.id)) return null;
     return found;
@@ -285,8 +217,7 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     return ids;
   }
 
-  // --- Dessin ---
-  const gridYears = d3.range(Math.ceil(xScale.domain()[0] / 50) * 50, xScale.domain()[1], 50);
+  const gridYears = d3.range(Math.ceil(xDomain[0] / 50) * 50, xDomain[1], 50);
 
   function drawGrid() {
     for (const y of gridYears) {
@@ -296,7 +227,7 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
       ctx.lineWidth = 1 / transform.k;
       ctx.beginPath();
       ctx.moveTo(gx, 0);
-      ctx.lineTo(gx, height);
+      ctx.lineTo(gx, refHeight);
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
@@ -330,9 +261,8 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     }
   }
 
-  const NODE_SCREEN_RADIUS = 6; // taille constante à l'écran, quel que soit le zoom
-
   function drawNodes() {
+    const NODE_SCREEN_RADIUS = 6;
     const r = NODE_SCREEN_RADIUS / transform.k;
     for (const p of people) {
       if (p._hidden || !nodeVisibleSet.has(p.id)) continue;
@@ -375,8 +305,6 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     ctx.globalAlpha = 1;
   }
 
-  // Bande de dates fixe à l'écran — toujours dessinée en dernier, au-dessus de tout,
-  // pour ne jamais être recouverte par les liens même très denses.
   function drawTimeAxis() {
     const barHeight = 26;
     ctx.fillStyle = COLORS.bgElevated;
@@ -387,12 +315,12 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     ctx.textBaseline = 'middle';
     ctx.fillStyle = COLORS.ivoryDim;
 
-    const minGap = 54; // espace minimal en pixels écran entre deux dates affichées
+    const minGap = 54;
     let lastX = -Infinity;
     for (const y of gridYears) {
       const screenX = transform.applyX(xScale(y));
       if (screenX < -40 || screenX > width + 40) continue;
-      if (screenX - lastX < minGap) continue; // saute cette date si trop proche de la précédente affichée
+      if (screenX - lastX < minGap) continue;
       ctx.fillText(String(y), screenX + 4, barHeight / 2);
       lastX = screenX;
     }
@@ -417,33 +345,22 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     drawTimeAxis();
   }
 
-  // --- Calcul de la simulation en arrière-plan, par petits paquets, pour ne
-  // jamais bloquer le thread principal plus de quelques millisecondes d'affilée. ---
-  function runSimulationAsync(onDone) {
-    simulation.stop();
-    const totalTicks = 300;
-    const batchSize = 12;
-    let i = 0;
+  // --- Cadrage initial : on adapte le cadre de référence précalculé
+  // (refWidth × refHeight) à la taille réelle de l'écran du visiteur,
+  // sans aucun calcul de simulation — juste une mise à l'échelle. ---
+  const fitScale = Math.min(width / refWidth, height / refHeight);
+  const initialTransform = d3.zoomIdentity
+    .translate((width - refWidth * fitScale) / 2, (height - refHeight * fitScale) / 2)
+    .scale(fitScale);
 
-    function step() {
-      const end = Math.min(i + batchSize, totalTicks);
-      for (; i < end; i++) { simulation.tick(); }
-      sanitizePositions();
-      loadingEl.textContent = `Calcul de la disposition… ${Math.round((i / totalTicks) * 100)}%`;
-      if (i < totalTicks) {
-        setTimeout(step, 0);
-      } else {
-        onDone();
-      }
-    }
-    setTimeout(step, 0);
-  }
+  d3.select(canvasEl).call(zoom.transform, initialTransform);
+  updateVisibility();
+  draw();
 
-  runSimulationAsync(() => {
-    quadtree = d3.quadtree(people, d => d.x, d => d.y);
+  document.fonts.ready.then(() => {
+    ctx.font = '9px Inter, sans-serif';
+    for (const p of people) textWidth.set(p.id, ctx.measureText(p.name).width);
     updateVisibility();
-    draw();
-    loadingEl.remove();
   });
 
   function focusOn(id) {
@@ -451,8 +368,9 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     if (!d) return;
     selectedId = id;
     neighborSet = neighborsOf(id);
+    highlightActive = true;
     const t = d3.zoomIdentity.translate(width / 2, height / 2).scale(3).translate(-d.x, -d.y);
-    d3.select(canvasEl).transition().duration(700).call(zoom.transform, t);
+    d3.select(canvasEl).transition().duration(700).call(zoom.transform, t).on('end', updateVisibility);
   }
 
   function setHouseFilter(activeHouses) {
@@ -463,8 +381,6 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     updateVisibility();
   }
 
-  // Met en évidence un chemin précis (suite d'identifiants) — utilisé par le
-  // chercheur de lien de parenté — et cadre automatiquement la vue dessus.
   function highlightPath(ids) {
     highlightActive = true;
     selectedId = null;
