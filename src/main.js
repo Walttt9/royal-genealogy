@@ -4,6 +4,19 @@ import { createGraph } from './viz/graph.js';
 import { createKinshipTools, describeRelationship } from './lib/kinship.js';
 import { createInbreedingChart } from './viz/chart.js';
 import { createBirthplaceMap } from './viz/map.js';
+import { STORIES, resolveStoryPeople } from './lib/stories.js';
+
+
+function updateUrlForPerson(id) {
+  const url = new URL(window.location);
+  if (id) url.searchParams.set('personne', id);
+  else url.searchParams.delete('personne');
+  window.history.replaceState({}, '', url);
+}
+
+function getPersonIdFromUrl() {
+  return new URL(window.location).searchParams.get('personne');
+}
 
 const svgEl = document.getElementById('graph');
 const houseListEl = document.getElementById('house-list');
@@ -116,6 +129,7 @@ function formatDateFR(isoDate) {
 }
 
 function showDetail(person) {
+  updateUrlForPerson(person.id);
   detailContent.innerHTML = `
     <h2>${person.name}</h2>
     <p class="dates">${formatDateFR(person.birth)} — ${formatDateFR(person.death)}</p>
@@ -128,7 +142,10 @@ function showDetail(person) {
   detailPanel.classList.add('visible');
 }
 
-closeBtn.addEventListener('click', () => detailPanel.classList.remove('visible'));
+closeBtn.addEventListener('click', () => {
+  detailPanel.classList.remove('visible');
+  updateUrlForPerson(null);
+});
 
 // --- Lien de parenté entre deux personnes ---
 const kinshipToggle = document.getElementById('kinship-toggle');
@@ -248,3 +265,86 @@ mapToggle.addEventListener('click', () => {
 
 mapClose.addEventListener('click', () => mapOverlay.classList.remove('visible'));
 mapOverlay.addEventListener('click', (e) => { if (e.target === mapOverlay) mapOverlay.classList.remove('visible'); });
+
+// --- Ouverture directe via lien permanent (?personne=Qxxxxx dans l'URL) ---
+const initialPersonId = getPersonIdFromUrl();
+if (initialPersonId) {
+  const person = genealogy.people.find(p => p.id === initialPersonId);
+  if (person) {
+    // Petite pause pour laisser le graphe s'afficher avant de recadrer dessus,
+    // plus agréable visuellement qu'un saut instantané dès le premier rendu.
+    setTimeout(() => {
+      graph.focusOn(person.id);
+      showDetail(person);
+    }, 300);
+  }
+}
+
+// --- Récits guidés ---
+const storiesPanel = document.getElementById('stories-panel');
+const storiesToggle = document.getElementById('stories-toggle');
+const storiesClose = document.getElementById('stories-close');
+const storiesListEl = document.getElementById('stories-list');
+const storiesReaderEl = document.getElementById('stories-reader');
+const storiesBackBtn = document.getElementById('stories-back');
+const storiesStoryTitleEl = document.getElementById('stories-story-title');
+const storiesProgressEl = document.getElementById('stories-progress');
+const storiesStepTitleEl = document.getElementById('stories-step-title');
+const storiesStepTextEl = document.getElementById('stories-step-text');
+const storiesPrevBtn = document.getElementById('stories-prev');
+const storiesNextBtn = document.getElementById('stories-next');
+
+let currentStory = null;
+let currentStepIndex = 0;
+
+function renderStoriesList() {
+  storiesListEl.innerHTML = STORIES.map(s => `
+    <div class="story-card" data-id="${s.id}">
+      <h3>${s.title}</h3>
+      <p>${s.summary}</p>
+    </div>
+  `).join('');
+  storiesListEl.querySelectorAll('.story-card').forEach(card => {
+    card.addEventListener('click', () => openStory(card.dataset.id));
+  });
+}
+renderStoriesList();
+
+function openStory(id) {
+  currentStory = STORIES.find(s => s.id === id);
+  currentStepIndex = 0;
+  storiesListEl.classList.add('hidden');
+  storiesReaderEl.classList.remove('hidden');
+  storiesStoryTitleEl.textContent = currentStory.title;
+  renderStep();
+}
+
+function renderStep() {
+  const step = currentStory.steps[currentStepIndex];
+  storiesProgressEl.textContent = `Étape ${currentStepIndex + 1} / ${currentStory.steps.length}`;
+  storiesStepTitleEl.textContent = step.title;
+  storiesStepTextEl.textContent = step.text;
+  storiesPrevBtn.disabled = currentStepIndex === 0;
+  storiesNextBtn.textContent = currentStepIndex === currentStory.steps.length - 1 ? 'Terminer' : 'Suivant';
+
+  const matched = resolveStoryPeople(step.people, genealogy.people);
+  if (matched.length > 0) graph.highlightPath(matched.map(p => p.id));
+}
+
+storiesPrevBtn.addEventListener('click', () => {
+  if (currentStepIndex > 0) { currentStepIndex--; renderStep(); }
+});
+storiesNextBtn.addEventListener('click', () => {
+  if (currentStepIndex < currentStory.steps.length - 1) { currentStepIndex++; renderStep(); }
+  else closeStoryReader();
+});
+
+function closeStoryReader() {
+  storiesReaderEl.classList.add('hidden');
+  storiesListEl.classList.remove('hidden');
+  currentStory = null;
+}
+storiesBackBtn.addEventListener('click', closeStoryReader);
+
+storiesToggle.addEventListener('click', () => storiesPanel.classList.add('visible'));
+storiesClose.addEventListener('click', () => storiesPanel.classList.remove('visible'));

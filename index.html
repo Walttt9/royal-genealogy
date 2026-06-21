@@ -21,6 +21,7 @@
       <button id="kinship-toggle" class="topbar-btn">Lien de parenté</button>
       <button id="chart-toggle" class="topbar-btn">Évolution de la consanguinité</button>
       <button id="map-toggle" class="topbar-btn">Carte</button>
+      <button id="stories-toggle" class="topbar-btn">Récits</button>
       <div id="search-wrapper" class="search-wrapper">
         <input id="search" type="text" class="search-input" placeholder="Rechercher une personne…" autocomplete="off" />
         <ul id="search-results" class="search-dropdown"></ul>
@@ -51,6 +52,21 @@
             </div>
           </div>
           <div id="kinship-result"></div>
+        </div>
+        <div id="stories-panel">
+          <button id="stories-close" aria-label="Fermer">&times;</button>
+          <div id="stories-list"></div>
+          <div id="stories-reader" class="hidden">
+            <button id="stories-back">&larr; Tous les récits</button>
+            <h2 id="stories-story-title"></h2>
+            <div id="stories-progress"></div>
+            <h3 id="stories-step-title"></h3>
+            <p id="stories-step-text"></p>
+            <div class="stories-nav">
+              <button id="stories-prev">Précédent</button>
+              <button id="stories-next">Suivant</button>
+            </div>
+          </div>
         </div>
         <div id="legend">
         <h3>Légende</h3>

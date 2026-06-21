@@ -428,3 +428,75 @@ body {
   line-height: 1.5;
   opacity: 0.7;
 }
+
+.hidden { display: none; }
+
+#stories-panel {
+  position: fixed;
+  top: 64px;
+  right: 0;
+  width: 380px;
+  max-width: 90%;
+  height: calc(100vh - 64px);
+  background: var(--bg-elevated);
+  border-left: 1px solid var(--border);
+  padding: 24px;
+  transform: translateX(100%);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+  z-index: 45;
+}
+#stories-panel.visible { transform: translateX(0); }
+
+#stories-close {
+  background: none;
+  border: none;
+  color: var(--ivory-dim);
+  font-size: 1.4rem;
+  cursor: pointer;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.story-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.story-card:hover { border-color: var(--gold-dim); background: #ffffff08; }
+.story-card h3 { font-family: var(--font-display); color: var(--gold); font-size: 1.05rem; margin: 0 0 6px; }
+.story-card p { font-size: 0.82rem; color: var(--ivory-dim); margin: 0; line-height: 1.5; }
+
+#stories-back {
+  background: none;
+  border: none;
+  color: var(--ivory-dim);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0 0 16px;
+}
+#stories-back:hover { color: var(--gold); }
+
+#stories-story-title { font-family: var(--font-display); color: var(--gold); font-size: 1.2rem; margin: 0 0 4px; }
+#stories-progress { font-size: 0.72rem; color: var(--ivory-dim); margin-bottom: 18px; opacity: 0.7; }
+#stories-step-title { font-size: 0.95rem; color: var(--ivory); margin: 0 0 10px; }
+#stories-step-text { font-size: 0.88rem; line-height: 1.6; color: var(--ivory-dim); margin: 0 0 24px; }
+
+.stories-nav { display: flex; justify-content: space-between; gap: 12px; }
+.stories-nav button {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ivory-dim);
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.stories-nav button:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--gold); }
+.stories-nav button:disabled { opacity: 0.3; cursor: default; }

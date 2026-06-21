@@ -20,6 +20,7 @@ const HOUSES = [
   { label: 'Orange-Nassau', qid: 'Q155483' },
   { label: 'Saxe-Cobourg-Gotha', qid: 'Q1753846' },
   { label: 'Bragance', qid: 'Q853342' },
+  { label: 'Holstein-Gottorp-Romanov', qid: 'Q870568' },
 ];
 
 const SPARQL_ENDPOINT = 'https://query.wikidata.org/sparql';
