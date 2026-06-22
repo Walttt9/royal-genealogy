@@ -47,9 +47,32 @@ for (const house of graph.houseNames) {
 
 // --- Outil de recherche réutilisable (autocomplétion) ---
 function highlightMatch(name, query) {
-  const idx = name.toLowerCase().indexOf(query.toLowerCase());
+  const normalizedName = normalize(name);
+  const normalizedQuery = normalize(query);
+  const idx = normalizedName.indexOf(normalizedQuery);
   if (idx === -1) return name;
-  return `${name.slice(0, idx)}<mark>${name.slice(idx, idx + query.length)}</mark>${name.slice(idx + query.length)}`;
+  // On surligne dans le nom original en trouvant la bonne position
+  let charCount = 0;
+  let startIdx = -1;
+  let endIdx = -1;
+  for (let i = 0; i < name.length; i++) {
+    const nc = normalize(name[i]);
+    if (charCount === idx) startIdx = i;
+    charCount += nc.length;
+    if (charCount === idx + normalizedQuery.length) { endIdx = i + 1; break; }
+  }
+  if (startIdx === -1 || endIdx === -1) return name;
+  return `${name.slice(0, startIdx)}<mark>${name.slice(startIdx, endIdx)}</mark>${name.slice(endIdx)}`;
+}
+
+function normalize(str) {
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // retire les accents
+    .replace(/[-–—'']/g, ' ')        // tirets et apostrophes → espace
+    .replace(/\s+/g, ' ')            // espaces multiples → un seul
+    .trim();
 }
 
 function attachAutocomplete(inputEl, resultsEl, onSelect) {
@@ -57,11 +80,11 @@ function attachAutocomplete(inputEl, resultsEl, onSelect) {
   let activeIndex = -1;
 
   function render(query) {
-    const q = query.trim().toLowerCase();
+    const q = normalize(query);
     if (q.length < 2) { close(); return; }
     results = genealogy.people
-      .filter(p => p.name.toLowerCase().includes(q))
-      .sort((a, b) => a.name.toLowerCase().indexOf(q) - b.name.toLowerCase().indexOf(q))
+      .filter(p => normalize(p.name).includes(q))
+      .sort((a, b) => normalize(a.name).indexOf(q) - normalize(b.name).indexOf(q))
       .slice(0, 8);
     activeIndex = -1;
     resultsEl.innerHTML = results.length === 0
