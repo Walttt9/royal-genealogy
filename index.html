@@ -33,6 +33,7 @@
       <button id="chart-toggle" class="topbar-btn">Évolution de la consanguinité</button>
       <button id="map-toggle" class="topbar-btn">Carte</button>
       <button id="stories-toggle" class="topbar-btn">Récits</button>
+      <button id="about-toggle" class="topbar-btn">À propos</button>
       <div id="search-wrapper" class="search-wrapper">
         <input id="search" type="text" class="search-input" placeholder="Rechercher une personne…" autocomplete="off" />
         <ul id="search-results" class="search-dropdown"></ul>
@@ -117,6 +118,48 @@
         <div id="map-slider-bar"></div>
         <div id="map-legend"></div>
       </div>
+    </div>
+
+    <div id="about-overlay">
+  <div id="about-panel">
+    <button id="about-close" aria-label="Fermer">&times;</button>
+    <div id="about-content">
+
+      <h2>À propos de ce projet</h2>
+      <p>Ce site propose une exploration interactive des liens de parenté, des alliances matrimoniales et de la consanguinité au sein des grandes dynasties royales européennes, du Moyen Âge au XX<sup>e</sup> siècle. Il couvre actuellement 20 maisons royales, plus de 4 400 individus et près de 1 900 unions documentées.</p>
+
+      <h3>Source des données</h3>
+      <p>Toutes les données généalogiques proviennent de <a href="https://www.wikidata.org" target="_blank" rel="noopener">Wikidata</a>, la base de connaissances libre et collaborative maintenue par la Wikimedia Foundation. Elles sont interrogées via l'API SPARQL de Wikidata et mises à jour manuellement.</p>
+      <p>Wikidata documente de façon très inégale selon les époques et les dynasties : les figures du XIX<sup>e</sup> et XX<sup>e</sup> siècles sont généralement bien renseignées, tandis que les personnages médiévaux peuvent manquer de dates précises ou de liens familiaux complets. Certaines années de naissance affichées sont des estimations calculées à partir de la génération parentale.</p>
+
+      <h3>Le coefficient de consanguinité de Wright</h3>
+      <p>Le coefficient de consanguinité (noté φ) mesure la probabilité qu'un individu ait hérité d'un même gène de ses deux parents en raison d'un ancêtre commun. Il a été formalisé par le généticien Sewall Wright en 1922.</p>
+      <p>Quelques repères pour interpréter les valeurs affichées :</p>
+      <ul>
+        <li><strong>φ = 0,0625</strong> — cousins germains (un arrière-grand-parent commun)</li>
+        <li><strong>φ = 0,125</strong> — oncle/nièce ou demi-frère/demi-sœur</li>
+        <li><strong>φ = 0,25</strong> — frère et sœur issus des mêmes parents</li>
+        <li><strong>φ = 0,235</strong> — Isabelle II d'Espagne ⚭ François d'Assise (cas le plus extrême de notre base)</li>
+      </ul>
+      <p>Le calcul est effectué de façon récursive sur l'ensemble de l'arbre généalogique disponible. Plus l'arbre est complet, plus le coefficient est précis — ce qui signifie que les valeurs pour les dynasties médiévales, dont les données sont plus lacunaires, sont probablement sous-estimées.</p>
+
+      <h3>Limites et précautions</h3>
+      <p>Ce site est un outil de visualisation et d'exploration historique, pas une publication scientifique. Les données reflètent l'état actuel de Wikidata, qui peut contenir des erreurs, des lacunes ou des interprétations historiographiques contestées. Les coefficients de consanguinité calculés sont des approximations basées sur les liens familiaux documentés — ils ne tiennent pas compte des liaisons extraconjugales ni des adoptions.</p>
+      <p>Certaines personnes apparaissent dans le graphe comme de simples points sans information détaillée : ce sont des "stubs", des fiches minimales créées uniquement parce que la personne est le conjoint d'un membre d'une maison suivie, sans être elle-même documentée sous une propriété "noble family" dans Wikidata.</p>
+
+      <h3>Sources bibliographiques</h3>
+      <ul>
+        <li>Wright, S. (1922). <em>Coefficients of inbreeding and relationship.</em> The American Naturalist, 56(645), 330–338.</li>
+        <li>Alvarez, G., Ceballos, F. C., & Quinteiro, C. (2009). <em>The Role of Inbreeding in the Extinction of a European Royal Dynasty.</em> PLOS ONE.</li>
+        <li>Ceballos, F. C., & Álvarez, G. (2013). <em>Royal dynasties as human inbreeding laboratories.</em> Heredity.</li>
+        <li>Wikidata. <a href="https://www.wikidata.org" target="_blank" rel="noopener">wikidata.org</a> — source primaire de toutes les données généalogiques.</li>
+       </ul>
+
+       <h3>Contact et contributions</h3>
+       <p>Ce projet est open source sous licence <strong>MIT</strong>. Le code source est disponible sur <a href="https://github.com/Walttt9/royal-genealogy" target="_blank" rel="noopener">GitHub</a>. Pour signaler une erreur dans les données ou proposer une amélioration, vous pouvez ouvrir une <em>issue</em> directement sur le dépôt. Toute réutilisation du code doit mentionner l'auteur original et pointer vers le dépôt source.</p>
+
+      </div>
+     </div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>

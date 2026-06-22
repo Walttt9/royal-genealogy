@@ -160,6 +160,7 @@ function showDetail(person) {
         <img class="detail-image" src="${person.image}" alt="${person.name}" loading="lazy" />
       </div>` : ''}
     <h2>${person.name}</h2>
+    <a class="wikidata-link" href="https://www.wikidata.org/wiki/${person.id}" target="_blank" rel="noopener">Voir sur Wikidata ↗</a>
     ${isStub
       ? `<p class="stub-note">Données biographiques non disponibles dans Wikidata pour cette personne — elle apparaît uniquement comme conjoint·e d'un membre d'une maison suivie.</p>`
       : `
@@ -390,3 +391,12 @@ filtersToggle.addEventListener('click', () => {
   appEl.classList.toggle('filters-collapsed');
   filtersToggle.innerHTML = appEl.classList.contains('filters-collapsed') ? '&#8250;' : '&#8249;';
 });
+
+// --- À propos ---
+const aboutOverlay = document.getElementById('about-overlay');
+const aboutToggle = document.getElementById('about-toggle');
+const aboutClose = document.getElementById('about-close');
+
+aboutToggle.addEventListener('click', () => aboutOverlay.classList.add('visible'));
+aboutClose.addEventListener('click', () => aboutOverlay.classList.remove('visible'));
+aboutOverlay.addEventListener('click', (e) => { if (e.target === aboutOverlay) aboutOverlay.classList.remove('visible'); });
