@@ -1,5 +1,6 @@
 import './style.css';
 import genealogy from './data/genealogy.json';
+window.__genealogy = genealogy;
 import { createGraph } from './viz/graph.js';
 import { createKinshipTools, describeRelationship } from './lib/kinship.js';
 import { createInbreedingChart } from './viz/chart.js';

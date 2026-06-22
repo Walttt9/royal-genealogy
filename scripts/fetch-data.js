@@ -111,7 +111,19 @@ function groupByPerson(rows) {
 
     const person = people.get(id);
 
-    if (row.houseLabel) person.houses.add(row.houseLabel.value);
+    if (row.houseLabel) {
+  const raw = row.houseLabel.value;
+  // Normalisation des libellés Wikidata vers des noms cohérents
+  const HOUSE_ALIASES = {
+    'Maison Grimaldi': 'maison Grimaldi',
+    'Maison de Windsor': 'maison de Windsor',
+    'Habsbourg-Lorraine': 'maison de Habsbourg-Lorraine',
+    'Holstein‑Gottorp‑Romanov': 'maison de Holstein-Gottorp-Romanov',
+    'maison Romanov': 'maison des Romanov',
+    'deuxième maison de Bragance': 'maison de Bragance',
+    };
+   person.houses.add(HOUSE_ALIASES[raw] ?? raw);
+   }
 
     if (row.father) {
       person.father = { id: qidFromUri(row.father.value), name: row.fatherLabel?.value ?? null };
