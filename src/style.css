@@ -582,3 +582,11 @@ body {
 #app.filters-collapsed #filters-toggle::before {
   content: '›';
 }
+
+.stub-note {
+  color: var(--ivory-dim);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.6;
+  margin-top: 12px;
+}

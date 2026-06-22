@@ -63,6 +63,28 @@ export const STORIES = [
       },
     ],
   },
+  {
+    id: "francois-ferdinand",
+    title: "François-Ferdinand et l'attentat de Sarajevo",
+    summary: "L'archiduc héritier d'Autriche-Hongrie, sa femme morganatique Sophie Chotek, et l'assassinat qui déclencha la Première Guerre mondiale.",
+    steps: [
+      {
+        title: "Un héritier inattendu",
+        text: "François-Ferdinand n'était pas destiné au trône. C'est le suicide de l'archiduc Rodolphe en 1889, puis la mort de son propre père en 1896, qui font de lui l'héritier de l'empire austro-hongrois. Il est le neveu de l'empereur François-Joseph Ier.",
+        people: ["François-Ferdinand d'Autriche", "François-Joseph Ier d'Autriche"],
+      },
+      {
+        title: "Un mariage morganatique",
+        text: "En 1900, François-Ferdinand épouse Sophie Chotek, une comtesse tchèque jugée de rang insuffisant pour la famille impériale. L'empereur n'approuve l'union qu'à condition que leurs enfants renoncent à tout droit au trône — un mariage dit morganatique, qui exclut la descendance de la succession.",
+        people: ["François-Ferdinand d'Autriche", "Sophie Chotek"],
+      },
+      {
+        title: "L'attentat de Sarajevo",
+        text: "Le 28 juin 1914, François-Ferdinand et Sophie sont assassinés à Sarajevo par Gavrilo Princip, un nationaliste serbe de Bosnie. Leur mort déclenche, par le jeu des alliances européennes, la Première Guerre mondiale — le conflit le plus meurtrier qu'ait connu l'Europe jusqu'alors.",
+        people: ["François-Ferdinand d'Autriche", "Sophie Chotek"],
+      },
+    ],
+  },
 ];
 
 export function resolveStoryPeople(names, people) {

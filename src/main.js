@@ -153,15 +153,21 @@ function formatDateFR(isoDate) {
 
 function showDetail(person) {
   updateUrlForPerson(person.id);
+  const isStub = !person.birth && !person.death && person.houses.length === 0;
   detailContent.innerHTML = `
     <h2>${person.name}</h2>
+    ${isStub
+      ? `<p class="stub-note">Données biographiques non disponibles dans Wikidata pour cette personne — elle apparaît uniquement comme conjoint·e d'un membre d'une maison suivie.</p>`
+      : `
     <p class="dates">${formatDateFR(person.birth)} — ${formatDateFR(person.death)}</p>
     <p class="houses">${person.houses.join(', ')}</p>
     ${person.inbreedingCoefficient > 0 ? `<p class="inbreeding">Coefficient de consanguinité : ${person.inbreedingCoefficient.toFixed(4)}</p>` : ''}
     ${person.father ? `<p>Père : ${person.father.name ?? '?'}</p>` : ''}
     ${person.mother ? `<p>Mère : ${person.mother.name ?? '?'}</p>` : ''}
-    ${person.spouses.length ? `<p>Conjoint·e·s : ${person.spouses.map(s => s.name).join(', ')}</p>` : ''}
+    ${person.spouses?.length ? `<p>Conjoint·e·s : ${person.spouses.map(s => s.name).join(', ')}</p>` : ''}
+    `}
   `;
+  detailPanel.classList.remove('hidden');
   detailPanel.classList.add('visible');
 }
 
