@@ -107,6 +107,28 @@ export const STORIES = [
       },
     ],
   },
+  {
+    id: "bragance",
+    title: "Les mariages consanguins de la maison de Bragance",
+    summary: "Au XVIIIe siècle, la famille royale portugaise pousse la consanguinité à l'extrême : une reine épouse son propre oncle, et leur fille réitère le même schéma.",
+    steps: [
+      {
+        title: "Une reine épouse son oncle",
+        text: "En 1760, Marie Ire de Portugal épouse Pierre III de Portugal — son propre oncle paternel, frère de son père le roi José Ier. Cette union, bénie par l'Église sous dispense papale, produit un coefficient de parenté de 0,144 — équivalent à celui d'un mariage entre demi-frère et demi-sœur.",
+        people: ["Marie Ire de Portugal", "Pierre III de Portugal"],
+      },
+      {
+        title: "Le schéma se répète à la génération suivante",
+        text: "Leur fille Marie-Bénédicte de Portugal épouse à son tour un cousin très proche : l'Infant José, Prince du Brésil, fils aîné de Marie Ire et donc son propre frère aîné. Avec un coefficient de 0,201, c'est l'union la plus consanguine de toute la maison de Bragance — et l'une des plus extrêmes de notre base de données.",
+        people: ["Marie-Bénédicte de Portugal", "Infant José, Prince du Brésil"],
+      },
+      {
+        title: "Une tradition dynastique assumée",
+        text: "Ces unions n'étaient pas des accidents — elles reflétaient une stratégie délibérée de la cour portugaise pour concentrer le pouvoir et les héritages au sein de la famille royale, à l'image de ce que pratiquaient simultanément les Habsbourg en Espagne et les Bourbon en France.",
+        people: ["Marie Ire de Portugal", "Marie-Bénédicte de Portugal"],
+      },
+    ],
+  },
 ];
 
 export function resolveStoryPeople(names, people) {
