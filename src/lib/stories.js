@@ -129,6 +129,50 @@ export const STORIES = [
       },
     ],
   },
+  {
+    id: "trois-cousins-1914",
+    title: "Les trois cousins de 1914",
+    summary: "Wilhelm II, George V et Nicolas II étaient tous petits-fils de la reine Victoria. Ils s'appelaient Willy, Georgie et Nicky — et finirent par s'envoyer leurs armées.",
+    steps: [
+      {
+        title: "Une grand-mère pour toute l'Europe",
+        text: "La reine Victoria (1819–1901) eut neuf enfants, mariés dans presque toutes les cours d'Europe. Ses petits-fils Guillaume II d'Allemagne, George V de Grande-Bretagne et Nicolas II de Russie se retrouvèrent simultanément à la tête des trois plus grandes puissances du continent.",
+        people: ["Victoria", "Guillaume II", "George V", "Nicolas II de Russie"],
+      },
+      {
+        title: "Willy, Georgie et Nicky",
+        text: "Les trois cousins s'écrivirent pendant des décennies des lettres affectueuses signées de leurs surnoms de famille. En juillet 1914, Wilhelm II et Nicolas II échangèrent encore des télégrammes personnels pour tenter d'éviter la guerre — en vain. La mobilisation générale était déjà lancée.",
+        people: ["Guillaume II", "Nicolas II de Russie"],
+      },
+      {
+        title: "La fin des trois dynasties",
+        text: "La Première Guerre mondiale emporta les trois : Nicolas II fut fusillé avec sa famille en 1918, Wilhelm II abdiqua et mourut en exil, George V survécut mais dut changer le nom de sa maison de Saxe-Cobourg-Gotha en Windsor en 1917 — trop allemand pour un pays en guerre contre l'Allemagne.",
+        people: ["Guillaume II", "George V", "Nicolas II de Russie"],
+      },
+    ],
+  },
+  {
+    id: "charles-ii-genetique",
+    title: "Charles II d'Espagne sous le regard de la génétique",
+    summary: "En 2009, des généticiens ont calculé que Charles II avait un coefficient de consanguinité supérieur à celui d'un enfant issu d'un mariage entre frère et sœur. Comment en est-on arrivé là ?",
+    steps: [
+      {
+        title: "Six générations de mariages consanguins",
+        text: "Charles II d'Espagne (1661–1700) était l'aboutissement de six générations de mariages entre cousins, oncles et nièces au sein de la branche espagnole des Habsbourg. Son coefficient de consanguinité, calculé par Álvarez et al. en 2009, atteignait 0,254 — légèrement supérieur à celui d'un enfant issu d'un mariage entre frère et sœur (0,25).",
+        people: ["Philippe IV d'Espagne", "Marie-Anne d'Autriche"],
+      },
+      {
+        title: "Un corps qui trahit la généalogie",
+        text: "Les médecins de l'époque notèrent chez Charles II une mâchoire proéminente au point de l'empêcher de mâcher correctement, une langue trop grande pour sa bouche, des jambes si faibles qu'il ne put marcher avant quatre ans, et une stérilité complète malgré deux mariages. Ces traits correspondent aux effets documentés d'une dépression génomique par consanguinité.",
+        people: ["Philippe IV d'Espagne", "Marie-Anne d'Autriche"],
+      },
+      {
+        title: "L'extinction d'une lignée",
+        text: "Mort sans descendance en 1700, Charles II légua son trône à Philippe d'Anjou, petit-fils de Louis XIV — fondant ainsi la branche espagnole des Bourbon. La branche espagnole des Habsbourg, qui avait régné sur le plus grand empire du monde pendant deux siècles, s'éteignait ainsi directement par les conséquences de sa propre stratégie matrimoniale.",
+        people: ["Charles Quint", "Philippe IV d'Espagne"],
+      },
+    ],
+  },
 ];
 
 export function resolveStoryPeople(names, people) {
