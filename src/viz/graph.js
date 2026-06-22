@@ -69,7 +69,7 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     .sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }));
   const houseColor = d3.scaleOrdinal()
     .domain(houseNames)
-    .range(['#c9a35a', '#c9c15f', '#8fb35f', '#4fc9a0', '#5f93c9', '#6f7ec9', '#8a6ac9', '#b35fae', '#c9648f', '#c97a5a', '#7ec9c2', '#c9a05f'])
+    .range(['#c9a35a', '#c9c15f', '#8fb35f', '#4fc9a0', '#5f93c9', '#6f7ec9', '#8a6ac9', '#b35fae', '#c9648f', '#c97a5a', '#7ec9c2', '#c9a05f', '#e8856a', '#a0c97e', '#6ac9b5'])
     .unknown('#5a5650');
 
   // --- Préparation du canvas ---
