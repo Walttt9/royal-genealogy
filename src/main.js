@@ -358,6 +358,23 @@ function renderStep() {
   storiesProgressEl.textContent = `Étape ${currentStepIndex + 1} / ${currentStory.steps.length}`;
   storiesStepTitleEl.textContent = step.title;
   storiesStepTextEl.textContent = step.text;
+
+  // Image illustrative
+  let imageEl = document.getElementById('stories-step-image');
+  if (step.image) {
+    if (!imageEl) {
+      imageEl = document.createElement('figure');
+      imageEl.id = 'stories-step-image';
+      storiesStepTextEl.parentNode.insertBefore(imageEl, storiesStepTextEl);
+    }
+    imageEl.innerHTML = `
+      <img src="${step.image}" alt="${step.title}" loading="lazy" onerror="this.parentElement.style.display='none'" />
+      ${step.imageCaption ? `<figcaption>${step.imageCaption}</figcaption>` : ''}
+    `;
+    imageEl.style.display = '';
+  } else if (imageEl) {
+    imageEl.style.display = 'none';
+  }
   storiesPrevBtn.disabled = currentStepIndex === 0;
   storiesNextBtn.textContent = currentStepIndex === currentStory.steps.length - 1 ? 'Terminer' : 'Suivant';
 

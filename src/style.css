@@ -698,3 +698,24 @@ body {
 
 #about-content strong { color: var(--ivory); }
 #about-content em { color: var(--ivory-dim); }
+
+#stories-step-image {
+  margin: 0 0 16px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+#stories-step-image img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  border-radius: 8px;
+}
+#stories-step-image figcaption {
+  font-size: 0.7rem;
+  color: var(--ivory-dim);
+  font-style: italic;
+  margin-top: 6px;
+  opacity: 0.7;
+}
