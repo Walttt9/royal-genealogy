@@ -14,6 +14,33 @@ const raw = await readFile(new URL('../src/data/genealogy.json', import.meta.url
 const { people, couples } = JSON.parse(raw);
 const byId = new Map(people.map(p => [p.id, p]));
 
+// Index bidirectionnel des couples, pour pouvoir estimer l'année d'un "stub"
+// (personne sans date connue) à partir de celle de son époux/épouse plutôt
+// que de la placer au hasard sur toute la frise chronologique.
+const spouseOf = new Map();
+for (const c of couples) {
+  if (!byId.has(c.idA) || !byId.has(c.idB)) continue;
+  if (!spouseOf.has(c.idA)) spouseOf.set(c.idA, []);
+  spouseOf.get(c.idA).push(c.idB);
+  if (!spouseOf.has(c.idB)) spouseOf.set(c.idB, []);
+  spouseOf.get(c.idB).push(c.idA);
+}
+
+// Index des enfants par parent, pour estimer l'année d'un "stub" qui n'a
+// ni date, ni parents, ni conjoint exploitable — mais dont les enfants,
+// eux, sont des personnes documentées rattachées à une maison suivie.
+const childrenOf = new Map();
+for (const p of people) {
+  if (p.father && byId.has(p.father.id)) {
+    if (!childrenOf.has(p.father.id)) childrenOf.set(p.father.id, []);
+    childrenOf.get(p.father.id).push(p.id);
+  }
+  if (p.mother && byId.has(p.mother.id)) {
+    if (!childrenOf.has(p.mother.id)) childrenOf.set(p.mother.id, []);
+    childrenOf.get(p.mother.id).push(p.id);
+  }
+}
+
 // --- Estimation de l'année de naissance (identique à la logique utilisée jusqu'ici côté site) ---
 const yearCache = new Map();
 function yearOf(id, visited = new Set()) {
@@ -28,10 +55,24 @@ function yearOf(id, visited = new Set()) {
     return y;
   }
   const fatherYear = p.father ? yearOf(p.father.id, visited) : null;
+  if (fatherYear != null) { yearCache.set(id, fatherYear + 28); return fatherYear + 28; }
   const motherYear = p.mother ? yearOf(p.mother.id, visited) : null;
-  const y = fatherYear != null ? fatherYear + 28 : (motherYear != null ? motherYear + 26 : null);
-  yearCache.set(id, y);
-  return y;
+  if (motherYear != null) { yearCache.set(id, motherYear + 26); return motherYear + 26; }
+  // Aucune date, aucun parent connu (cas typique des "stubs") : on tente
+  // l'année du conjoint, bien plus pertinente qu'une position aléatoire.
+  for (const spouseId of spouseOf.get(id) ?? []) {
+    const spouseYear = yearOf(spouseId, visited);
+    if (spouseYear != null) { yearCache.set(id, spouseYear); return spouseYear; }
+  }
+  // Toujours rien : on tente l'année d'un enfant connu, moins 28 ans —
+  // cas des stubs dont le mariage lui-même n'a jamais été capté (le
+  // conjoint extérieur n'apparaissant que comme "père"/"mère" d'une
+  // personne principale, jamais comme conjoint d'une personne principale).
+  for (const childId of childrenOf.get(id) ?? []) {
+    const childYear = yearOf(childId, visited);
+    if (childYear != null) { const y = childYear - 28; yearCache.set(id, y); return y; }
+  }
+  return null;
 }
 
 const knownYears = people.map(p => yearOf(p.id)).filter(y => y != null);
