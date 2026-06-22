@@ -73,9 +73,9 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
     .unknown('#5a5650');
 
   // --- Préparation du canvas ---
-  const width = canvasEl.clientWidth;
-  const height = canvasEl.clientHeight;
   const dpr = window.devicePixelRatio || 1;
+  let width = canvasEl.clientWidth;
+  let height = canvasEl.clientHeight;
   canvasEl.width = width * dpr;
   canvasEl.height = height * dpr;
   const ctx = canvasEl.getContext('2d');
@@ -93,6 +93,21 @@ export function createGraph({ svgEl: canvasEl, data, onSelect }) {
   function isAlliance(d) {
     return !d.source.houses.some(h => d.target.houses.includes(h));
   }
+  function resizeCanvas() {
+    const newWidth = canvasEl.clientWidth;
+    const newHeight = canvasEl.clientHeight;
+    if (newWidth === 0 || newHeight === 0) return;
+    width = newWidth;
+    height = newHeight;
+    canvasEl.width = newWidth * dpr;
+    canvasEl.height = newHeight * dpr;
+    ctx.scale(dpr, dpr);
+    updateVisibility();
+    draw();
+  }
+
+  const resizeObserver = new ResizeObserver(() => resizeCanvas());
+  resizeObserver.observe(canvasEl);
   const filiationLinks = allLinks.filter(d => d.type === 'parent');
   const spouseResolved = allLinks.filter(d => d.type === 'spouse');
   const consanguineLinks = spouseResolved.filter(d => d.kinship >= CONSANGUINITY_THRESHOLD);
