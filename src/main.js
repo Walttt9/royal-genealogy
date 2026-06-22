@@ -156,6 +156,10 @@ function showDetail(person) {
   updateUrlForPerson(person.id);
   const isStub = !person.birth && !person.death && person.houses.length === 0;
   detailContent.innerHTML = `
+    ${person.image ? `
+      <div class="detail-image-wrapper">
+        <img class="detail-image" src="${person.image}" alt="${person.name}" loading="lazy" />
+      </div>` : ''}
     <h2>${person.name}</h2>
     ${isStub
       ? `<p class="stub-note">Données biographiques non disponibles dans Wikidata pour cette personne — elle apparaît uniquement comme conjoint·e d'un membre d'une maison suivie.</p>`
