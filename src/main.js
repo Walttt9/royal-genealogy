@@ -348,3 +348,12 @@ storiesBackBtn.addEventListener('click', closeStoryReader);
 
 storiesToggle.addEventListener('click', () => storiesPanel.classList.add('visible'));
 storiesClose.addEventListener('click', () => storiesPanel.classList.remove('visible'));
+
+// --- Toggle panneau filtres ---
+const filtersToggle = document.getElementById('filters-toggle');
+const appEl = document.getElementById('app');
+
+filtersToggle.addEventListener('click', () => {
+  appEl.classList.toggle('filters-collapsed');
+  filtersToggle.innerHTML = appEl.classList.contains('filters-collapsed') ? '&#8250;' : '&#8249;';
+});

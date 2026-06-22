@@ -33,7 +33,59 @@ body {
     "topbar topbar"
     "filters graph";
   height: 100vh;
+  transition: grid-template-columns 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: visible;
 }
+
+#app.filters-collapsed {
+  grid-template-columns: 0px 1fr;
+}
+#app.filters-collapsed #filters {
+  overflow: hidden;
+  padding: 0;
+  border-right: none;
+}
+
+#filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+#filters-header h2 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--ivory-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+
+#filters-toggle {
+  grid-area: filters;
+  align-self: center;
+  justify-self: end;
+  position: relative;
+  right: -28px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-left: none;
+  color: var(--ivory-dim);
+  width: 28px;
+  height: 56px;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+#filters-toggle:hover { color: var(--gold); border-color: var(--gold-dim); }
 
 #topbar {
   grid-area: topbar;
@@ -130,15 +182,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   min-width: 0;
-}
-
-#filters h2 {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  color: var(--ivory-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin: 0 0 12px;
+  position: relative;
 }
 
 #graph-container {
@@ -511,3 +555,30 @@ body {
 }
 .stories-nav button:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--gold); }
 .stories-nav button:disabled { opacity: 0.3; cursor: default; }
+
+#filters-toggle {
+  grid-area: filters;
+  justify-self: end;
+  align-self: center;
+  position: relative;
+  z-index: 20;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-left: none;
+  color: var(--ivory-dim);
+  width: 20px;
+  height: 64px;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  margin-right: -20px;
+}
+#filters-toggle:hover { color: var(--gold); border-color: var(--gold-dim); }
+#app.filters-collapsed #filters-toggle { left: 0px; }
+
+#app.filters-collapsed #filters-toggle::before {
+  content: '›';
+}
