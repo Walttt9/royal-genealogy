@@ -21,6 +21,8 @@ const HOUSES = [
   { label: 'Saxe-Cobourg-Gotha', qid: 'Q1753846' },
   { label: 'Bragance', qid: 'Q853342' },
   { label: 'Holstein-Gottorp-Romanov', qid: 'Q870568' },
+  { label: 'Habsbourg-Lorraine', qid: 'Q645719' },
+  { label: 'Autriche-Este', qid: 'Q1115749' },
 ];
 
 const SPARQL_ENDPOINT = 'https://query.wikidata.org/sparql';
