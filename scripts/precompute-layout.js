@@ -6,8 +6,8 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import * as d3 from 'd3';
 
-const REF_WIDTH = 1600;
-const REF_HEIGHT = 900;
+const REF_WIDTH = 3800;
+const REF_HEIGHT = 1800;
 const TICKS = 400; // pas de contrainte de temps ici, on peut converger longuement
 
 const raw = await readFile(new URL('../src/data/genealogy.json', import.meta.url), 'utf-8');
@@ -122,9 +122,9 @@ function sanitizePositions() {
 const simulation = d3.forceSimulation(people)
   .force('link', d3.forceLink(allLinks).id(d => d.id).distance(l => l.type === 'spouse' ? 24 : 50).strength(0.2))
   .force('charge', d3.forceManyBody().strength(-30).distanceMax(400))
-  .force('x', d3.forceX(d => xScale(d._year)).strength(0.85))
-  .force('y', d3.forceY(REF_HEIGHT / 2).strength(0.04))
-  .force('collide', d3.forceCollide(9))
+  .force('x', d3.forceX(d => xScale(d._year)).strength(0.9))
+  .force('y', d3.forceY(REF_HEIGHT / 2).strength(0.06))
+  .force('collide', d3.forceCollide(12))
   .velocityDecay(0.5);
 
 simulation.stop();
