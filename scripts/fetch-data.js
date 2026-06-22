@@ -23,6 +23,11 @@ const HOUSES = [
   { label: 'Holstein-Gottorp-Romanov', qid: 'Q870568' },
   { label: 'Habsbourg-Lorraine', qid: 'Q645719' },
   { label: 'Autriche-Este', qid: 'Q1115749' },
+  { label: 'Bourbon d\'Espagne', qid: 'Q895180' },
+  { label: 'Bourbon des Deux-Siciles', qid: 'Q895188' },
+  { label: 'Bourbon-Parme', qid: 'Q895187' },
+  { label: 'Orléans', qid: 'Q3835' },
+  { label: 'Grimaldi', qid: 'Q668182' },
 ];
 
 const SPARQL_ENDPOINT = 'https://query.wikidata.org/sparql';
