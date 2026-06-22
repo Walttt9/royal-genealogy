@@ -85,6 +85,28 @@ export const STORIES = [
       },
     ],
   },
+  {
+    id: "isabelle-ii",
+    title: "Isabelle II et le cas le plus consanguin d'Espagne",
+    summary: "Le mariage le plus consanguin de toute notre base de données : deux cousins issus de germains, unis par calcul dynastique, dont la descendance régna jusqu'au XXe siècle.",
+    steps: [
+      {
+        title: "Une union calculée",
+        text: "En 1846, la reine Isabelle II d'Espagne épouse son cousin François d'Assise de Bourbon. Tous deux descendent de Charles IV d'Espagne — lui par son père, elle par sa mère. Avec un coefficient de parenté de 0,235, c'est l'union la plus consanguine de toute notre base de données, dépassant même les cas les plus extrêmes des Habsbourg.",
+        people: ["Isabelle II d'Espagne", "François d'Assise de Bourbon"],
+      },
+      {
+        title: "Un mariage politique avant tout",
+        text: "Ce mariage était avant tout le résultat de manœuvres diplomatiques entre les puissances européennes, chacune cherchant à placer un candidat favorable sur le trône d'Espagne. La consanguinité n'était pas un frein — elle était même perçue comme une garantie de stabilité dynastique.",
+        people: ["Isabelle II d'Espagne", "François d'Assise de Bourbon"],
+      },
+      {
+        title: "Une descendance qui régna",
+        text: "Malgré les doutes sur la paternité de certains enfants — François d'Assise et Isabelle II vivaient quasi séparés — leur fils Alphonse XII monta sur le trône en 1875, fondant la lignée qui règne encore aujourd'hui en Espagne avec Felipe VI.",
+        people: ["Isabelle II d'Espagne", "Alphonse XII d'Espagne"],
+      },
+    ],
+  },
 ];
 
 export function resolveStoryPeople(names, people) {
